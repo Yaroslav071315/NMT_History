@@ -1,4 +1,4 @@
-package com.example.nmt_history.viewmodel
+package com.example.nmt_history.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nmt_history.ui.theme.NMT_HistoryTheme
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
 
 class ActiveTestIntroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,68 +86,110 @@ fun ActiveTestIntroScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit
     var selectedIndex by remember { mutableStateOf(-1) }
     val currentQuestion = questions[currentIndex]
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        // Верхній рядок з кнопкою Назад
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        // Горизонтальна орієнтація → питання ліворуч, варіанти та кнопки праворуч
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Top
         ) {
-            Button(onClick = onBackClick) {
-                Text("⬅️ Назад")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Питання ${currentIndex + 1} з ${questions.size}",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        Text(
-            text = currentQuestion.text,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        currentQuestion.options.forEachIndexed { index, option ->
-            Button(
-                onClick = { selectedIndex = index },
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+            Column(
+                modifier = Modifier.weight(1f).padding(end = 16.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                Text(option)
+                Button(onClick = onBackClick) { Text("⬅️") }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Питання ${currentIndex + 1} з ${questions.size}")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(currentQuestion.text, style = MaterialTheme.typography.headlineSmall)
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                currentQuestion.options.forEachIndexed { index, option ->
+                    Button(
+                        onClick = { selectedIndex = index },
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                    ) {
+                        Text(option)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (selectedIndex != -1) {
+                    if (selectedIndex == currentQuestion.correctIndex) {
+                        Text("✅ Правильно!", color = MaterialTheme.colorScheme.primary)
+                    } else {
+                        Text("❌ Неправильно", color = MaterialTheme.colorScheme.error)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (currentIndex < questions.size - 1) {
+                        Button(onClick = {
+                            currentIndex++
+                            selectedIndex = -1
+                        }) {
+                            Text("➡️ Наступне питання")
+                        }
+                    } else {
+                        Text("🎉 Ви завершили тест!")
+                    }
+                }
             }
         }
+    } else {
+        // Портретна орієнтація → все в колонку
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Button(onClick = onBackClick) { Text("⬅️") }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Питання ${currentIndex + 1} з ${questions.size}")
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(currentQuestion.text, style = MaterialTheme.typography.headlineSmall)
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (selectedIndex != -1) {
-            if (selectedIndex == currentQuestion.correctIndex) {
-                Text("✅ Правильно!", color = MaterialTheme.colorScheme.primary)
-            } else {
-                Text("❌ Неправильно. Спробуйте ще раз.", color = MaterialTheme.colorScheme.error)
+            currentQuestion.options.forEachIndexed { index, option ->
+                Button(
+                    onClick = { selectedIndex = index },
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                ) {
+                    Text(option)
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (currentIndex < questions.size - 1) {
-                Button(
-                    onClick = {
+            if (selectedIndex != -1) {
+                if (selectedIndex == currentQuestion.correctIndex) {
+                    Text("✅ Правильно!", color = MaterialTheme.colorScheme.primary)
+                } else {
+                    Text("❌ Неправильно", color = MaterialTheme.colorScheme.error)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (currentIndex < questions.size - 1) {
+                    Button(onClick = {
                         currentIndex++
                         selectedIndex = -1
-                    },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("➡️ Наступне питання")
+                    }) {
+                        Text("➡️ Наступне питання")
+                    }
+                } else {
+                    Text("🎉 Ви завершили тест!")
                 }
-            } else {
-                Text("🎉 Ви завершили тест!", style = MaterialTheme.typography.bodyLarge)
             }
         }
     }

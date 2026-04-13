@@ -1,4 +1,4 @@
-package com.example.nmt_history.viewmodel
+package com.example.nmt_history.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,23 +12,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.nmt_history.ui.theme.NMT_HistoryTheme
 import androidx.compose.ui.platform.LocalContext
-import com.example.nmt_history.viewmodel.TestsByThemesActivity
+import com.example.nmt_history.ui.theme.NMT_HistoryTheme
 
-
-
-class TestsActivity : ComponentActivity() {
+class TestsByThemesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             NMT_HistoryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TestsScreen(
+                    TestsByThemesScreen(
                         modifier = Modifier.padding(innerPadding),
+                        onBackClick = {
+                            startActivity(Intent(this, TestsActivity::class.java))
+                            finish()
+                        },
                         onHomeClick = {
-                            // повернення на головний екран
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
                         }
@@ -40,7 +40,11 @@ class TestsActivity : ComponentActivity() {
 }
 
 @Composable
-fun TestsScreen(modifier: Modifier = Modifier, onHomeClick: () -> Unit) {
+fun TestsByThemesScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit
+) {
     val context = LocalContext.current
     Column(
         modifier = modifier
@@ -48,11 +52,14 @@ fun TestsScreen(modifier: Modifier = Modifier, onHomeClick: () -> Unit) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // верхній рядок з кнопкою 🏠 справа
+        // Верхній рядок з кнопками Назад і Головний екран
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Button(onClick = onBackClick) {
+                Text("⬅️")
+            }
             Button(onClick = onHomeClick) {
                 Text("🏠")
             }
@@ -61,40 +68,33 @@ fun TestsScreen(modifier: Modifier = Modifier, onHomeClick: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "📝 Тести",
+            text = "Тести за темами",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Button(
             onClick = {
-                context.startActivity(Intent(context, TestsByThemesActivity::class.java))
+                context.startActivity(Intent(context, ActiveTestIntroActivity::class.java))
             },
             modifier = Modifier.fillMaxWidth().padding(8.dp)
         ) {
-            Text("Тести за темами")
+            Text("Вступ до історії України")
         }
 
         Button(
-            onClick = { /* TODO: Navigate to full timed test */ },
+            onClick = { /* TODO: Navigate to Ancient Ukrainian History test */ },
             modifier = Modifier.fillMaxWidth().padding(8.dp)
         ) {
-            Text("Повний тест на час")
-        }
-
-        Button(
-            onClick = { /* TODO: Navigate to random questions */ },
-            modifier = Modifier.fillMaxWidth().padding(8.dp)
-        ) {
-            Text("Випадкові питання")
+            Text("Стародавня історія України")
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TestsScreenPreview() {
+fun TestsByThemesPreview() {
     NMT_HistoryTheme {
-        TestsScreen(onHomeClick = {})
+        TestsByThemesScreen(onBackClick = {}, onHomeClick = {})
     }
 }
