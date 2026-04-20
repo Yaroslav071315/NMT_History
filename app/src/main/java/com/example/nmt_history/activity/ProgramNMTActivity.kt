@@ -1,5 +1,6 @@
 package com.example.nmt_history.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nmt_history.ui.theme.NMT_HistoryTheme
@@ -21,18 +23,14 @@ class ProgramNMTActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NMT_HistoryTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ProgramNMTScreen(modifier = Modifier.padding(innerPadding)) {
-                        finish() // повернення назад
-                    }
-                }
+                ProgramNMTScreen { finish() }
             }
         }
     }
 }
 
 @Composable
-fun ProgramNMTScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
+fun ProgramNMTScreen(onBackClick: () -> Unit) {
     val topics = listOf(
         "Стародавня історія України",
         "Русь-Україна (Київська держава)",
@@ -62,15 +60,55 @@ fun ProgramNMTScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     )
 
     var checkedStates by remember { mutableStateOf(List(topics.size) { false }) }
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        // Верхній рядок з кнопкою Назад
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Верхній рядок з кнопками Назад і Меню
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(onClick = onBackClick) {
                 Text("⬅️")
+            }
+
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text("☰")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("🏠 Головний екран") },
+                        onClick = {
+                            context.startActivity(Intent(context, MainActivity::class.java))
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📝 Тести") },
+                        onClick = {
+                            context.startActivity(Intent(context, TestsActivity::class.java))
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📚 Матеріали") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📊 Прогрес") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🏛 Пам’ятки та персоналії") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                }
             }
         }
 

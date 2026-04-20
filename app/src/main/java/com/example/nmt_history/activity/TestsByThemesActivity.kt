@@ -7,12 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
 import com.example.nmt_history.ui.theme.NMT_HistoryTheme
 
 class TestsByThemesActivity : ComponentActivity() {
@@ -46,22 +46,66 @@ fun TestsByThemesScreen(
     onHomeClick: () -> Unit
 ) {
     val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Верхній рядок з кнопками Назад і Головний екран
+        // Верхній рядок з кнопками Назад і Меню
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(onClick = onBackClick) {
                 Text("⬅️")
             }
-            Button(onClick = onHomeClick) {
-                Text("🏠")
+
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text("☰")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("🏠 Головний екран") },
+                        onClick = {
+                            onHomeClick()
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📝 Тести") },
+                        onClick = {
+                            context.startActivity(Intent(context, TestsActivity::class.java))
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📚 Матеріали") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📖 Програма НМТ") },
+                        onClick = {
+                            context.startActivity(Intent(context, ProgramNMTActivity::class.java))
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📊 Прогрес") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🏛 Пам’ятки та персоналії") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                }
             }
         }
 
@@ -98,3 +142,4 @@ fun TestsByThemesPreview() {
         TestsByThemesScreen(onBackClick = {}, onHomeClick = {})
     }
 }
+

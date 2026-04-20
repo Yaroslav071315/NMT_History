@@ -7,14 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nmt_history.ui.theme.NMT_HistoryTheme
-import androidx.compose.ui.platform.LocalContext
-
 
 class TestsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +24,8 @@ class TestsActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TestsScreen(
                         modifier = Modifier.padding(innerPadding),
+                        onBackClick = { finish() },
                         onHomeClick = {
-                            // повернення на головний екран
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
                         }
@@ -38,21 +37,69 @@ class TestsActivity : ComponentActivity() {
 }
 
 @Composable
-fun TestsScreen(modifier: Modifier = Modifier, onHomeClick: () -> Unit) {
+fun TestsScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit
+) {
     val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // верхній рядок з кнопкою 🏠 справа
+        // Верхній рядок з кнопками Назад і Меню
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = onHomeClick) {
-                Text("🏠")
+            Button(onClick = onBackClick) {
+                Text("⬅️")
+            }
+
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text("☰")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("🏠 Головний екран") },
+                        onClick = {
+                            onHomeClick()
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📝 Тести") },
+                        onClick = { expanded = false } // вже тут
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📚 Матеріали") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📖 Програма НМТ") },
+                        onClick = {
+                            context.startActivity(Intent(context, ProgramNMTActivity::class.java))
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📊 Прогрес") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🏛 Пам’ятки та персоналії") },
+                        onClick = { expanded = false /* TODO */ }
+                    )
+                }
             }
         }
 
@@ -93,6 +140,6 @@ fun TestsScreen(modifier: Modifier = Modifier, onHomeClick: () -> Unit) {
 @Composable
 fun TestsScreenPreview() {
     NMT_HistoryTheme {
-        TestsScreen(onHomeClick = {})
+        TestsScreen(onBackClick = {}, onHomeClick = {})
     }
 }
