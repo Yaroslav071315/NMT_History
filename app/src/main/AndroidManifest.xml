@@ -15,6 +15,7 @@
         <activity android:name=".activity.TestsByThemesActivity" />
         <activity android:name=".activity.ActiveTestIntroActivity" />
         <activity android:name=".activity.ProgramNMTActivity" />
+        <activity android:name=".activity.ProgressActivity" />
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"

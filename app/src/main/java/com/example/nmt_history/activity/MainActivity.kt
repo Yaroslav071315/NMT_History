@@ -94,7 +94,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 ) { Text("📖 Програма НМТ") }
 
                 Button(
-                    onClick = { /* TODO: Navigate to Progress */ },
+                    onClick = { context.startActivity(Intent(context, ProgressActivity::class.java)) },
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) { Text("📊 Прогрес") }
 
@@ -141,7 +141,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
             ) { Text("📖 Програма НМТ") }
 
             Button(
-                onClick = { /* TODO: Navigate to Progress */ },
+                onClick = { context.startActivity(Intent(context, ProgressActivity::class.java)) },
                 modifier = Modifier.fillMaxWidth().padding(8.dp)
             ) { Text("📊 Прогрес") }
 
